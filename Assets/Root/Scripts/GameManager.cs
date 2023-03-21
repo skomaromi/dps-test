@@ -1,4 +1,5 @@
 using Unity.Entities;
+using Unity.Transforms;
 using UnityEngine;
 
 namespace Root
@@ -26,7 +27,13 @@ namespace Root
         {
             World world = World.DefaultGameObjectInjectionWorld;
             EntityManager entityManager = world.EntityManager;
-            entityManager.Instantiate(original);
+            Entity entity = entityManager.Instantiate(original);
+
+            Translation translation = new Translation
+            {
+                Value = position
+            };
+            entityManager.SetComponentData(entity, translation);
         }
 
         private void OnDestroy()
