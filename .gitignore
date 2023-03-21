@@ -8,4 +8,5 @@
 .idea/
 *.csproj
 *.sln
+*.user
 *.DotSettings
