@@ -43,10 +43,14 @@ namespace Root
             Job.WithCode(() =>
             {
                 WalkMap(settings, ref tileMap, ref random);
+                
+                // TODO: seems like it can be parallelized ... make this a separate job and chain work before and
+                // after in dependencies?
                 FillUnpopulatedTiles(settings, ref tileMap);
+                
                 PlaceTiles(TileType.Producer, settings.producerCount, ref tileMap, settings, ref random);
                 PlaceTiles(TileType.Consumer, settings.consumerCount, ref tileMap, settings, ref random);
-                PlaceRoadTiles(60, ref tileMap, settings, ref random);
+                
                 SpawnPrefabs(settings, ref commandBuffer, ref tileMap);
 
                 // add tag to mark grid as initialized
@@ -56,67 +60,6 @@ namespace Root
             Dependency = tileMap.Dispose(Dependency);
             
             beginSimulationSystem.AddJobHandleForProducer(Dependency);
-        }
-
-        private static void PlaceRoadTiles(int tileCount, ref NativeParallelHashMap<int2, TileType> tileMap, GameSettings settings, ref Random random)
-        {
-            int remainingCount = tileCount;
-
-            int2 mapPoint = default;
-            bool hasPoint = false;
-            Direction direction = default;
-            bool seekingNeighbour = false;
-            bool triedNewDirection = false;
-
-            while (true)
-            {
-                if (remainingCount < 0)
-                    break;
-
-                if (hasPoint)
-                {
-                    if (!seekingNeighbour)
-                    {
-                        tileMap[mapPoint] = TileType.Road;
-                        remainingCount--;
-                    }
-                    
-                    int2 pointCandidate = MoveInDirection(mapPoint, direction);
-
-                    if (!IsWithinGrid(pointCandidate, settings.gridSize))
-                    {
-                        if (!triedNewDirection)
-                        {
-                            direction = GetRandomViableDirection(ref random, mapPoint, settings);
-                            triedNewDirection = true;
-                            seekingNeighbour = true;
-                        }
-                        else
-                        {
-                            hasPoint = false;
-                            seekingNeighbour = false;
-                        }
-                    }
-                    else
-                    {
-                        // is within grid
-                        mapPoint = pointCandidate;
-                        hasPoint = true;
-
-                        seekingNeighbour = false;
-                    }
-                }
-                else
-                {
-                    int2 pointCandidate = GetRandomPointInGrid(ref random, settings);
-
-                    if (tileMap[pointCandidate] != TileType.Blocked)
-                        continue;
-
-                    mapPoint = pointCandidate;
-                    hasPoint = true;
-                }
-            }
         }
 
         private static void PlaceTiles(TileType tileType, int tileCount,
