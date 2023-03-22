@@ -48,8 +48,11 @@ MonoBehaviour:
   tileSize: 1.5
   maxEmptyTilesFactor: 0.5
   moveLimitFactor: 6
-  blockedPrefab: {fileID: 5110459520864116338, guid: fbd230b3127a6814ebf14c6c97a5a48d, type: 3}
+  producerCount: 2
+  consumerCount: 5
   emptyPrefab: {fileID: 5110459520864116338, guid: 72de53a2ed183b94a8f4c2f555b762ef, type: 3}
+  blockedPrefab: {fileID: 5110459520864116338, guid: fbd230b3127a6814ebf14c6c97a5a48d, type: 3}
+  roadPrefab: {fileID: 5110459520864116338, guid: cfa09231ff084de45a735a27ff5cd874, type: 3}
   producerPrefab: {fileID: 5110459520864116338, guid: 186caf3660cc14b4dac692f543a5c187, type: 3}
   consumerPrefab: {fileID: 5110459520864116338, guid: 5aae19977fbc50a4bbe53ca0b9dec004, type: 3}
   vehiclePrefab: {fileID: 5110459520864116338, guid: 3fffeeb5225c75141bd6ba6b1c582423, type: 3}

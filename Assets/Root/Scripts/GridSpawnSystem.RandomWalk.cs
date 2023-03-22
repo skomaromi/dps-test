@@ -108,6 +108,18 @@ namespace Root
             return (Direction)random.NextInt(0, (int)Direction.Left);
         }
 
+        private static int2 GetNextInt2(ref Random random, int minX, int minY, int maxX, int maxY)
+        {
+            return random.NextInt2(
+                new int2(minX, minY), 
+                new int2(maxX, maxY));
+        }
+
+        private static int2 GetRandomPointInGrid(ref Random random, GameSettings settings)
+        {
+            return GetNextInt2(ref random, 0, 0, settings.gridSize.x, settings.gridSize.y);
+        }
+
         private static void WalkMap(GameSettings settings, ref NativeParallelHashMap<int2, TileType> tileMap,
             ref Random random)
         {
@@ -123,10 +135,7 @@ namespace Root
             Direction direction = GetRandomDirection(ref random);
             int remainingSteps = stepCount;
 
-            int2 startingPosition = new int2(
-                random.NextInt(0, gridSize.x),
-                random.NextInt(0, gridSize.y));
-
+            int2 startingPosition = GetRandomPointInGrid(ref random, settings);
             int2 position = startingPosition;
 
             int emptyTiles = gridArea;
@@ -144,8 +153,7 @@ namespace Root
                     // minimum step count is met, but is the empty tiles condition met as well?
                     if (emptyTiles > maxEmptyTiles)
                     {
-                        // should continue
-
+                        // empty tiles count still greater than maximum allowed, don't break yet
                         // ... but what if already running for too long?
                         if (totalMoves >= moveLimit)
                         {
@@ -156,7 +164,7 @@ namespace Root
                     }
                     else
                     {
-                        // can break
+                        // all steps exhausted and empty tile count is less than maximum allowed, can break
                         break;
                     }
                 }
