@@ -4,7 +4,10 @@ using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using UnityEditor;
+using UnityEditor.Rendering;
 using UnityEngine;
+using Debug = System.Diagnostics.Debug;
 using Random = Unity.Mathematics.Random;
 
 namespace Root
@@ -19,8 +22,8 @@ namespace Root
 
     public enum TileType
     {
-        Void,
-        Inhabitable,
+        Empty,
+        Blocked,
         
         Road,
         Producer,
@@ -48,7 +51,7 @@ namespace Root
             GameSettings settings = GetSingleton<GameSettings>();
             Entity settingsEntity = GetSingletonEntity<GameSettings>();
             
-            EntityCommandBuffer ecb = beginSimulationSystem.CreateCommandBuffer();
+            EntityCommandBuffer commandBuffer = beginSimulationSystem.CreateCommandBuffer();
 
             Random random = new Random((uint)Stopwatch.GetTimestamp());
             
@@ -61,11 +64,11 @@ namespace Root
             Job.WithCode(() =>
             {
                 WalkMap(settings, ref tileMap, ref random);
-                FillUnpopulatedWithVoid(settings, ref tileMap);
-                SpawnPrefabs(settings, ref ecb, ref tileMap);
+                FillUnpopulatedWithEmpty(settings, ref tileMap);
+                SpawnPrefabs(settings, ref commandBuffer, ref tileMap);
 
                 // add tag to mark grid as initialized
-                ecb.AddComponent<GridInitializedTag>(settingsEntity);
+                commandBuffer.AddComponent<GridInitializedTag>(settingsEntity);
             }).Schedule();
 
             Dependency = tileMap.Dispose(Dependency);
@@ -78,7 +81,7 @@ namespace Root
             foreach (KeyValue<int2, TileType> pair in tileMap)
             {
                 Entity entityInstance = commandBuffer.Instantiate(
-                    pair.Value == TileType.Inhabitable ? settings.inhabitablePrefab : settings.voidPrefab);
+                    pair.Value == TileType.Blocked ? settings.blockedPrefab : settings.emptyPrefab);
 
                 int2 tileCoordinates = pair.Key;
                 float tileSize = settings.tileSize;
@@ -93,7 +96,7 @@ namespace Root
             }
         }
 
-        private static void FillUnpopulatedWithVoid(GameSettings settings,
+        private static void FillUnpopulatedWithEmpty(GameSettings settings,
             ref NativeParallelHashMap<int2, TileType> tileMap)
         {
             Vector2Int gridSize = settings.gridSize;
@@ -106,7 +109,7 @@ namespace Root
                     if (tileMap.ContainsKey(position))
                         continue;
                         
-                    tileMap.Add(position, TileType.Void);
+                    tileMap.Add(position, TileType.Empty);
                 }
             }
         }
@@ -114,8 +117,8 @@ namespace Root
         private static bool IsWithinGrid(int2 position, Vector2Int gridSize)
         {
             return
-                position.x > 0 && position.x < gridSize.x &&
-                position.y > 0 && position.y < gridSize.y;
+                position.x >= 0 && position.x < gridSize.x &&
+                position.y >= 0 && position.y < gridSize.y;
         }
 
         private static void WalkMap(GameSettings settings, ref NativeParallelHashMap<int2, TileType> tileMap,
@@ -138,28 +141,125 @@ namespace Root
                 random.NextInt(0, gridSize.y));
 
             int2 position = startingPosition;
+
+            int emptyTiles = gridArea;
+            int maxEmptyTiles = settings.maxEmptyTiles;
+
+            int moveLimit = (int)(gridArea * settings.moveLimitFactor);
+            int totalMoves = 0;
+
+            bool forceChangeDirection = false;
             
-            while (remainingSteps > 0)
+            while (true)
             {
-                if (!tileMap.ContainsKey(position))
-                    tileMap.Add(position, TileType.Inhabitable);
+                if (remainingSteps <= 0)
+                {
+                    // minimum step count is met, but is the empty tiles condition met as well?
+                    if (emptyTiles > maxEmptyTiles)
+                    {
+                        // should continue
+                        
+                        // ... but what if already running for too long?
+                        if (totalMoves >= moveLimit)
+                        {
+                            UnityEngine.Debug.Log($"running for too long! totalMoves: {totalMoves}, moveLimit: {moveLimit}");
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        // can break
+                        break;
+                    }
+                }
+
+                totalMoves++;
+                UnityEngine.Debug.Log($"iteration {totalMoves} of WalkMap");
+
+                if (tileMap.TryAdd(position, TileType.Blocked))
+                {
+                    UnityEngine.Debug.Log($"marking tile {position.x}, {position.y} as blocked!");
+                    emptyTiles--;
+                }
                     
                 // TODO: might secretly bump head a few times into the same wall, rework logic to change direction
                 // the first time it does that
-                bool shouldChangeDirection = random.NextBool();
+                bool shouldChangeDirection = random.NextBool() || forceChangeDirection;
 
                 if (shouldChangeDirection)
-                    direction = GetRandomDirection(ref random);
+                {
+                    direction = GetRandomViableDirection(ref random, position, settings);
+                    forceChangeDirection = false;
+                }
 
                 int2 newPosition = MoveInDirection(position, direction);
-                bool nextPositionIsOutOfBounds = !IsWithinGrid(newPosition, gridSize);
+                bool newPositionIsOutOfBounds = !IsWithinGrid(newPosition, gridSize);
 
-                if (nextPositionIsOutOfBounds)
+                if (newPositionIsOutOfBounds)
+                {
+                    UnityEngine.Debug.Log("next position out of bounds!");
+                    forceChangeDirection = true;
                     continue;
+                }
                     
                 position = newPosition;
                 remainingSteps--;
             }
+        }
+
+        // TODO: make more efficient. IsViableMove could directly compute destination position and check if hits
+        // the corresponding wall (e.g. for `up` just check incremented y against gridSize)
+        private static Direction GetRandomViableDirection(ref Random random, int2 position, GameSettings settings)
+        {
+            int viableDirectionCount = GetViableDirectionCount(position, settings);
+            int directionIndex = random.NextInt(0, viableDirectionCount);
+            return GetViableDirection(directionIndex, position, settings);
+        }
+
+        private static Direction GetViableDirection(int directionIndex, int2 position, GameSettings settings)
+        {
+            int candidateIndex = -1;
+
+            bool CheckNext(Direction direction)
+            {
+                if (!IsViableMove(position, settings, direction)) 
+                    return false;
+                
+                candidateIndex++;
+                return candidateIndex == directionIndex;
+            }
+
+            if (CheckNext(Direction.Up))
+                return Direction.Up;
+            
+            if (CheckNext(Direction.Right))
+                return Direction.Right;
+            
+            if (CheckNext(Direction.Down))
+                return Direction.Down;
+            
+            return Direction.Left;
+        }
+        
+        private static int GetViableDirectionCount(int2 position, GameSettings settings)
+        {
+            int viableDirectionCount = 0;
+
+            if (IsViableMove(position, settings, Direction.Up))
+                viableDirectionCount++;
+            if (IsViableMove(position, settings, Direction.Right))
+                viableDirectionCount++;
+            if (IsViableMove(position, settings, Direction.Down))
+                viableDirectionCount++;
+            if (IsViableMove(position, settings, Direction.Left))
+                viableDirectionCount++;
+
+            return viableDirectionCount;
+        }
+
+        private static bool IsViableMove(int2 position, GameSettings settings, Direction direction)
+        {
+            return IsWithinGrid(MoveInDirection(position, direction), settings.gridSize);
         }
 
         private static int2 MoveInDirection(int2 position, Direction direction)

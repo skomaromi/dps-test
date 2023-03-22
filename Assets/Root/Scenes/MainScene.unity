@@ -388,8 +388,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridSize: {x: 16, y: 16}
   tileSize: 1.5
-  inhabitablePrefab: {fileID: 5110459520864116338, guid: fbd230b3127a6814ebf14c6c97a5a48d, type: 3}
-  voidPrefab: {fileID: 5110459520864116338, guid: 72de53a2ed183b94a8f4c2f555b762ef, type: 3}
+  maxEmptyTiles: 100
+  moveLimitFactor: 6
+  blockedPrefab: {fileID: 5110459520864116338, guid: fbd230b3127a6814ebf14c6c97a5a48d, type: 3}
+  emptyPrefab: {fileID: 5110459520864116338, guid: 72de53a2ed183b94a8f4c2f555b762ef, type: 3}
   vehiclePrefab: {fileID: 5110459520864116338, guid: 3fffeeb5225c75141bd6ba6b1c582423, type: 3}
 --- !u!4 &1460998237
 Transform:

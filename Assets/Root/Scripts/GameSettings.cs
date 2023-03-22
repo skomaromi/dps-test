@@ -6,14 +6,18 @@ namespace Root
     [GenerateAuthoringComponent]
     public struct GameSettings : IComponentData
     {
-        // grid size
+        // generation parameters
         public Vector2Int gridSize;
         public float tileSize;
+        public int maxEmptyTiles;
         
+        // a factor of grid area, used to prevent infinite loops
+        public float moveLimitFactor;
+
         // prefabs
-        public Entity inhabitablePrefab;
-        public Entity voidPrefab;
-        
+        public Entity blockedPrefab;
+        public Entity emptyPrefab;
+
         public Entity vehiclePrefab;
     }
 }
