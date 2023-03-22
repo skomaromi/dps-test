@@ -21,6 +21,8 @@ namespace Root
         public Entity blockedPrefab;
         public Entity emptyPrefab;
 
+        public Entity producerPrefab;
+        public Entity consumerPrefab;
         public Entity vehiclePrefab;
     }
 }

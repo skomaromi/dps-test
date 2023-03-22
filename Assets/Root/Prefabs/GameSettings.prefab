@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &278452016329797375
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 278452016329797369}
+  - component: {fileID: 278452016329797368}
+  m_Layer: 0
+  m_Name: GameSettings
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &278452016329797369
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 278452016329797375}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &278452016329797368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 278452016329797375}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb565c6bad594bb8bc7c3a6f61b73fbe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gridSize: {x: 256, y: 256}
+  tileSize: 1.5
+  maxEmptyTilesFactor: 0.5
+  moveLimitFactor: 6
+  blockedPrefab: {fileID: 5110459520864116338, guid: fbd230b3127a6814ebf14c6c97a5a48d, type: 3}
+  emptyPrefab: {fileID: 5110459520864116338, guid: 72de53a2ed183b94a8f4c2f555b762ef, type: 3}
+  producerPrefab: {fileID: 5110459520864116338, guid: 186caf3660cc14b4dac692f543a5c187, type: 3}
+  consumerPrefab: {fileID: 5110459520864116338, guid: 5aae19977fbc50a4bbe53ca0b9dec004, type: 3}
+  vehiclePrefab: {fileID: 5110459520864116338, guid: 3fffeeb5225c75141bd6ba6b1c582423, type: 3}
