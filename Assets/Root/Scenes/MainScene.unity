@@ -386,9 +386,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb565c6bad594bb8bc7c3a6f61b73fbe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridSize: {x: 16, y: 16}
+  gridSize: {x: 256, y: 256}
   tileSize: 1.5
-  maxEmptyTiles: 100
+  maxEmptyTilesFactor: 0.5
   moveLimitFactor: 6
   blockedPrefab: {fileID: 5110459520864116338, guid: fbd230b3127a6814ebf14c6c97a5a48d, type: 3}
   emptyPrefab: {fileID: 5110459520864116338, guid: 72de53a2ed183b94a8f4c2f555b762ef, type: 3}

@@ -9,9 +9,12 @@ namespace Root
         // generation parameters
         public Vector2Int gridSize;
         public float tileSize;
-        public int maxEmptyTiles;
         
-        // a factor of grid area, used to prevent infinite loops
+        // factor of grid area (gridSize.x * gridSize.y)
+        public float maxEmptyTilesFactor;
+        
+        // used to prevent infinite loops
+        // factor of grid area
         public float moveLimitFactor;
 
         // prefabs
