@@ -1,4 +1,3 @@
-using System;
 using Unity.Entities;
 using UnityEngine;
 
@@ -29,6 +28,7 @@ namespace Root
         public Entity roadPrefab;
         public Entity producerPrefab;
         public Entity consumerPrefab;
+        
         public Entity vehiclePrefab;
 
         public Entity GetTilePrefab(TileType tileType)
@@ -37,14 +37,19 @@ namespace Root
             {
                 case TileType.Empty:
                     return emptyPrefab;
+                
                 case TileType.Blocked:
                     return blockedPrefab;
+                
                 case TileType.Road:
                     return roadPrefab;
+                
                 case TileType.Producer:
                     return producerPrefab;
+                
                 case TileType.Consumer:
                     return consumerPrefab;
+                
                 default:
                     return Entity.Null;
             }

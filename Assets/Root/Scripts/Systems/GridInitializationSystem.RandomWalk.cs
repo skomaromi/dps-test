@@ -5,7 +5,7 @@ using Random = Unity.Mathematics.Random;
 
 namespace Root
 {
-    public partial class GridSpawnSystem
+    public partial class GridInitializationSystem
     {
         private static int2 MoveInDirection(int2 position, Direction direction)
         {
