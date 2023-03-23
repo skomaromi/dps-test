@@ -112,7 +112,6 @@ namespace Root
         private static bool AnyAdjacentTileIsType(int2 mapPoint, TileType tileType,
             ref NativeParallelHashMap<int2, TileType> tileMap, GameSettings settings)
         {
-            // TODO: bring bounds check closer, deduplicate
             int2 pointAbove = MoveInDirection(mapPoint, Direction.Up);
             if (IsWithinGrid(pointAbove, settings.gridSize) && tileMap[pointAbove] == tileType)
                 return true;
