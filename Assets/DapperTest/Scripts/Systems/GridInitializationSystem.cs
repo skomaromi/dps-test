@@ -1,8 +1,10 @@
 using System.Diagnostics;
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
+using Unity.Transforms;
 using Debug = UnityEngine.Debug;
 using Random = Unity.Mathematics.Random;
 
@@ -63,22 +65,49 @@ namespace DapperTest
             EntityQuery consumerQuery = GetEntityQuery(ComponentType.ReadOnly<Consumer>());
             
             Debug.Log($"found {consumerQuery.CalculateEntityCount()} consumers.");
-
+            
             // TODO: don't schedule job if no producers
+            // TODO: ScheduleParallel
+            // TODO: try remove diagonal roads
             JobHandle connectionJobHandle = new EstablishConsumerProducerConnectionJob()
             {
-                settings = settings,
                 gridSize = gridSize,
                 tileMap = tileMap,
                 producerEntities = producerEntities,
-                // commandBuffer = commandBuffer,
                 gridTranslationFromEntity = GetComponentDataFromEntity<GridTranslation>(),
                 consumerReferenceBufferFromEntity = GetBufferFromEntity<ConsumerReference>(),
                 consumerProducerPathBufferFromEntity = GetBufferFromEntity<ConsumerProducerPathNode>()
             }.Schedule(consumerQuery);
 
+            commandBuffer = new EntityCommandBuffer(Allocator.TempJob);
+            
+            JobHandle floorPaintingJobHandle = Job.WithCode(() =>
+            {
+                foreach (KeyValue<int2, TileType> pair in tileMap)
+                {
+                    int2 gridPosition = pair.Key;
+                    TileType tileType = pair.Value;
+
+                    if (tileType != TileType.Road && 
+                        tileType != TileType.Blocked) 
+                        continue;
+                    
+                    Entity entityInstance = commandBuffer.Instantiate(settings.GetTilePrefab(tileType));
+                    float3 tilePosition = new float3(
+                        settings.tileSize * gridPosition.x,
+                        0f,
+                        settings.tileSize * gridPosition.y);
+                    Translation translation = new Translation() { Value = tilePosition };
+                    commandBuffer.SetComponent(entityInstance, translation);
+                }
+            }).Schedule(connectionJobHandle);
+
             producerEntities.Dispose(connectionJobHandle);
-            tileMap.Dispose(connectionJobHandle);
+            tileMap.Dispose(floorPaintingJobHandle);
+            
+            floorPaintingJobHandle.Complete();
+            commandBuffer.Playback(EntityManager);
+            commandBuffer.Dispose();
 
             // TODO: do we need this?
             // beginSimulationSystem.AddJobHandleForProducer(Dependency);

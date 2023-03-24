@@ -16,13 +16,10 @@ namespace DapperTest
         private const int InvalidNodeIndex = -1;
         
         // job parameters
-        public GameSettings settings;
-        // TODO: this might not be necessary if road painting here works
         public int2 gridSize;
         public NativeParallelHashMap<int2, TileType> tileMap;
         public NativeArray<Entity> producerEntities;
-        public EntityCommandBuffer commandBuffer;
-        
+
         // getters
         public ComponentDataFromEntity<GridTranslation> gridTranslationFromEntity;
         public BufferFromEntity<ConsumerReference> consumerReferenceBufferFromEntity;
@@ -30,14 +27,12 @@ namespace DapperTest
 
         private void Execute(Entity consumerEntity)
         {
-            // what do we do here? so - this is a Consumer foreach
-            // for each consumer, seek nearest producer
-            // nearest producer is sought by pathfinding
-            // nearest producer is the one with the least gCost for end node
-            
-            // * add consumer entity ref to producer for producer round robin
-            // * store path to producer in consumer entity (DynamicBuffer)
-            // * paint tilemap with road tiles when closest producer found
+            // * find nearest producer
+            // * add consumer entity ref to nearest producer for producer round
+            //   robin
+            // * store path to nearest producer in consumer entity
+            //   (DynamicBuffer)
+            // * paint tilemap with road tiles from consumer to nearest producer
             
             int producerEntityCount = producerEntities.Length;
 
@@ -106,19 +101,6 @@ namespace DapperTest
                 
                 // paint road on tile map
                 tileMap[node] = TileType.Road;
-                
-                // paint actual road tiles
-                // TODO: this won't work, but YOLO
-                /*
-                Entity roadEntityInstance = commandBuffer.Instantiate(settings.roadPrefab);
-                float3 tilePosition = new float3(
-                    settings.tileSize * node.x,
-                    0f,
-                    settings.tileSize * node.y);
-                Translation translation = new Translation() { Value = tilePosition };
-                
-                commandBuffer.SetComponent(roadEntityInstance, translation);
-                */
             }
 
             // pathfinding buffers release
