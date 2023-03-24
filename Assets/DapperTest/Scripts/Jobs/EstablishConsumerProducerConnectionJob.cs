@@ -4,6 +4,9 @@ using Unity.Mathematics;
 
 namespace DapperTest
 {
+    // as per:
+    // https://forum.unity.com/threads/compilation-of-issues-with-0-50.1253973/page-2#post-8512268
+    #pragma warning disable 0282
     public partial struct EstablishConsumerProducerConnectionJob : IJobEntity
     {
         private const int StraightMoveCost = 10;
