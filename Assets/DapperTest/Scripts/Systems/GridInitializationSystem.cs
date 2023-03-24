@@ -3,6 +3,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
+using Debug = UnityEngine.Debug;
 using Random = Unity.Mathematics.Random;
 
 namespace DapperTest
@@ -36,7 +37,7 @@ namespace DapperTest
             NativeParallelHashMap<int2, TileType> tileMap =
                 new NativeParallelHashMap<int2, TileType>(gridArea, Allocator.TempJob);
 
-            EntityCommandBuffer commandBuffer = beginSimulationSystem.CreateCommandBuffer();
+            EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.TempJob);
 
             // TODO: there are better ways to do this?
             Random random = new Random((uint)Stopwatch.GetTimestamp());
@@ -51,19 +52,26 @@ namespace DapperTest
                 random = random
             };
             gridInitializationJob.Run();
+            
+            // TODO: could be done more elegant if EstablishConsumerProducerConnectionJob spawn moved to another system which waits for GridInitializedTag
+            commandBuffer.Playback(EntityManager);
+            commandBuffer.Dispose();
 
             EntityQuery producerQuery = GetEntityQuery(ComponentType.ReadWrite<Producer>());
             NativeArray<Entity> producerEntities = producerQuery.ToEntityArray(Allocator.TempJob);
 
             EntityQuery consumerQuery = GetEntityQuery(ComponentType.ReadOnly<Consumer>());
             
+            Debug.Log($"found {consumerQuery.CalculateEntityCount()} consumers.");
+
+            // TODO: don't schedule job if no producers
             JobHandle connectionJobHandle = new EstablishConsumerProducerConnectionJob()
             {
                 settings = settings,
                 gridSize = gridSize,
                 tileMap = tileMap,
                 producerEntities = producerEntities,
-                commandBuffer = commandBuffer,
+                // commandBuffer = commandBuffer,
                 gridTranslationFromEntity = GetComponentDataFromEntity<GridTranslation>(),
                 consumerReferenceBufferFromEntity = GetBufferFromEntity<ConsumerReference>(),
                 consumerProducerPathBufferFromEntity = GetBufferFromEntity<ConsumerProducerPathNode>()

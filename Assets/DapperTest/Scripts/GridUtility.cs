@@ -59,11 +59,13 @@ namespace DapperTest
                 // TODO: `if` on every foreach iteration, refactor?
                 if (tileType == TileType.Producer || tileType == TileType.Consumer)
                 {
+                    // configure GridTranslation
                     GridTranslation gridTranslation = new GridTranslation()
                     {
                         position = tileCoordinates
                     };
-                    commandBuffer.AddComponent(entityInstance, gridTranslation);
+                    
+                    commandBuffer.SetComponent(entityInstance, gridTranslation);
                 }
             }
         }
