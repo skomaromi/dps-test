@@ -4,7 +4,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 
-namespace Root
+namespace DapperTest
 {
     public static class GridUtility
     {
@@ -48,6 +48,16 @@ namespace Root
                 
                 Translation translation = new Translation() { Value = tilePosition };
                 commandBuffer.SetComponent(entityInstance, translation);
+                
+                // TODO: `if` on every foreach iteration, refactor?
+                if (tileType == TileType.Producer || tileType == TileType.Consumer)
+                {
+                    GridTranslation gridTranslation = new GridTranslation()
+                    {
+                        position = tileCoordinates
+                    };
+                    commandBuffer.AddComponent(entityInstance, gridTranslation);
+                }
             }
         }
     }

@@ -1,13 +1,13 @@
 using Unity.Entities;
-using UnityEngine;
+using Unity.Mathematics;
 
-namespace Root
+namespace DapperTest
 {
     [GenerateAuthoringComponent]
     public struct GameSettings : IComponentData
     {
         // generation parameters
-        public Vector2Int gridSize;
+        public int2 gridSize;
         public float tileSize;
         
         // factor of grid area (gridSize.x * gridSize.y)

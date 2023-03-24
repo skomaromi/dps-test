@@ -1,12 +1,58 @@
-﻿using Unity.Collections;
+using Unity.Collections;
+using Unity.Entities;
+using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
 using Random = Unity.Mathematics.Random;
 
-namespace Root
+namespace DapperTest
 {
-    public partial class GridInitializationSystem
+    public struct GridInitializationJob : IJob
     {
+        public GameSettings settings;
+        public Entity settingsEntity;
+            
+        public NativeParallelHashMap<int2, TileType> tileMap;
+        public EntityCommandBuffer commandBuffer;
+        public Random random;
+
+        public void Execute()
+        {
+            WalkMap(settings, ref tileMap, ref random);
+            
+            // TODO: split in subregions, parallelize and chain work before and
+            // after?
+            FillUnpopulatedTiles(settings, ref tileMap);
+            
+            PlaceTiles(TileType.Producer, settings.producerCount, ref tileMap, settings, ref random);
+            PlaceTiles(TileType.Consumer, settings.consumerCount, ref tileMap, settings, ref random);
+                
+            // TODO: NOT optimal. use flags
+            GridUtility.SpawnPrefabs(settings, ref commandBuffer, ref tileMap, TileType.Empty);
+            GridUtility.SpawnPrefabs(settings, ref commandBuffer, ref tileMap, TileType.Producer);
+            GridUtility.SpawnPrefabs(settings, ref commandBuffer, ref tileMap, TileType.Consumer);
+
+            // add tag to mark grid as initialized
+            commandBuffer.AddComponent<GridInitializedTag>(settingsEntity);
+        }
+        
+        private static Direction GetRandomDirection(ref Random random)
+        {
+            return (Direction)random.NextInt(0, (int)Direction.Left);
+        }
+        
+        private static int2 GetNextInt2(ref Random random, int minX, int minY, int maxX, int maxY)
+        {
+            return random.NextInt2(
+                new int2(minX, minY), 
+                new int2(maxX, maxY));
+        }
+        
+        private static int2 GetRandomPointInGrid(ref Random random, GameSettings settings)
+        {
+            return GetNextInt2(ref random, 0, 0, settings.gridSize.x, settings.gridSize.y);
+        }
+        
         private static int2 MoveInDirection(int2 position, Direction direction)
         {
             int2 newPosition = position;
@@ -41,7 +87,7 @@ namespace Root
             return newPosition;
         }
         
-        private static bool IsWithinGrid(int2 position, Vector2Int gridSize)
+        private static bool IsWithinGrid(int2 position, int2 gridSize)
         {
             return
                 position.x >= 0 && position.x < gridSize.x &&
@@ -103,34 +149,15 @@ namespace Root
             return GetViableDirection(directionIndex, position, settings);
         }
         
-        private static Direction GetRandomDirection(ref Random random)
-        {
-            return (Direction)random.NextInt(0, (int)Direction.Left);
-        }
-
-        private static int2 GetNextInt2(ref Random random, int minX, int minY, int maxX, int maxY)
-        {
-            return random.NextInt2(
-                new int2(minX, minY), 
-                new int2(maxX, maxY));
-        }
-
-        private static int2 GetRandomPointInGrid(ref Random random, GameSettings settings)
-        {
-            return GetNextInt2(ref random, 0, 0, settings.gridSize.x, settings.gridSize.y);
-        }
-
         private static void WalkMap(GameSettings settings, ref NativeParallelHashMap<int2, TileType> tileMap,
             ref Random random)
         {
-            Vector2Int gridSize = settings.gridSize;
+            int2 gridSize = settings.gridSize;
 
             int gridMinAxis = math.min(gridSize.x, gridSize.y);
             int gridArea = gridSize.x * gridSize.y;
 
             int stepCount = random.NextInt(gridMinAxis, gridArea);
-
-            Debug.Log($"chose {stepCount} steps, total cell count: {gridArea}");
 
             Direction direction = GetRandomDirection(ref random);
             int remainingSteps = stepCount;
@@ -156,11 +183,7 @@ namespace Root
                         // empty tiles count still greater than maximum allowed, don't break yet
                         // ... but what if already running for too long?
                         if (totalMoves >= moveLimit)
-                        {
-                            Debug.Log(
-                                $"running for too long! totalMoves: {totalMoves}, moveLimit: {moveLimit}");
                             break;
-                        }
                     }
                     else
                     {
@@ -170,13 +193,9 @@ namespace Root
                 }
 
                 totalMoves++;
-                Debug.Log($"iteration {totalMoves} of WalkMap");
 
-                if (tileMap.TryAdd(position, TileType.Blocked))
-                {
-                    Debug.Log($"marking tile {position.x}, {position.y} as blocked!");
+                if (tileMap.TryAdd(position, TileType.Blocked)) 
                     emptyTiles--;
-                }
 
                 // TODO: might secretly bump head a few times into the same wall, rework logic to change direction
                 // the first time it does that
@@ -193,13 +212,69 @@ namespace Root
 
                 if (newPositionIsOutOfBounds)
                 {
-                    Debug.Log("next position out of bounds!");
                     forceChangeDirection = true;
                     continue;
                 }
 
                 position = newPosition;
                 remainingSteps--;
+            }
+        }
+        
+        private static void FillUnpopulatedTiles(GameSettings settings,
+            ref NativeParallelHashMap<int2, TileType> tileMap)
+        {
+            int2 gridSize = settings.gridSize;
+            
+            for (int x = 0; x < gridSize.x; x++)
+            {
+                for (int y = 0; y < gridSize.y; y++)
+                {
+                    int2 position = new int2(x, y);
+                    
+                    // if add fails, point already populated by non-Empty TileType
+                    tileMap.TryAdd(position, TileType.Empty);
+                }
+            }
+        }
+        
+        private static bool AnyAdjacentTileIsType(int2 mapPoint, TileType tileType,
+            ref NativeParallelHashMap<int2, TileType> tileMap, GameSettings settings)
+        {
+            int2 pointAbove = MoveInDirection(mapPoint, Direction.Up);
+            if (IsWithinGrid(pointAbove, settings.gridSize) && tileMap[pointAbove] == tileType)
+                return true;
+            
+            int2 pointRight = MoveInDirection(mapPoint, Direction.Right);
+            if (IsWithinGrid(pointRight, settings.gridSize) && tileMap[pointRight] == tileType)
+                return true;
+            
+            int2 pointBelow = MoveInDirection(mapPoint, Direction.Down);
+            if (IsWithinGrid(pointBelow, settings.gridSize) && tileMap[pointBelow] == tileType)
+                return true;
+            
+            int2 pointLeft = MoveInDirection(mapPoint, Direction.Left);
+            if (IsWithinGrid(pointLeft, settings.gridSize) && tileMap[pointLeft] == tileType)
+                return true;
+
+            return false;
+        }
+        
+        private static void PlaceTiles(TileType tileType, int tileCount,
+            ref NativeParallelHashMap<int2, TileType> tileMap, GameSettings settings, ref Random random)
+        {
+            int remainingCount = tileCount;
+
+            while (remainingCount > 0)
+            {
+                int2 mapPoint = GetRandomPointInGrid(ref random, settings);
+                
+                if (tileMap[mapPoint] != TileType.Blocked && 
+                    !AnyAdjacentTileIsType(mapPoint, TileType.Blocked, ref tileMap, settings))
+                    continue;
+
+                tileMap[mapPoint] = tileType;
+                remainingCount--;
             }
         }
     }

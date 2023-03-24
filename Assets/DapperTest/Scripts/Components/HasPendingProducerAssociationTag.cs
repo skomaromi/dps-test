@@ -1,6 +1,6 @@
 using Unity.Entities;
 
-namespace Root
+namespace DapperTest
 {
     public struct HasPendingProducerAssociationTag : IComponentData { }
 }

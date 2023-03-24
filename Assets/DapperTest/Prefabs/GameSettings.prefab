@@ -44,7 +44,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb565c6bad594bb8bc7c3a6f61b73fbe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridSize: {x: 256, y: 256}
+  gridSize:
+    x: 256
+    y: 256
   tileSize: 1.5
   maxEmptyTilesFactor: 0.5
   moveLimitFactor: 6

@@ -2,7 +2,7 @@ using Unity.Entities;
 using Unity.Transforms;
 using UnityEngine;
 
-namespace Root
+namespace DapperTest
 {
     public class GameManager : MonoBehaviour
     {
