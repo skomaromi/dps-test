@@ -8,6 +8,13 @@ namespace DapperTest
 {
     public static class GridUtility
     {
+        public static bool IsWithinGrid(int2 position, int2 gridSize)
+        {
+            return
+                position.x >= 0 && position.x < gridSize.x &&
+                position.y >= 0 && position.y < gridSize.y;
+        }
+        
         public static void SpawnPrefabs(GameSettings settings, ref EntityCommandBuffer commandBuffer, ref NativeParallelHashMap<int2, TileType> tileMap)
         {
             foreach (KeyValue<int2, TileType> pair in tileMap)

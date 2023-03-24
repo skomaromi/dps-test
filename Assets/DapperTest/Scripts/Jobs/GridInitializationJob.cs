@@ -2,7 +2,6 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
-using UnityEngine;
 using Random = Unity.Mathematics.Random;
 
 namespace DapperTest
@@ -20,8 +19,8 @@ namespace DapperTest
         {
             WalkMap(settings, ref tileMap, ref random);
             
-            // TODO: split in subregions, parallelize and chain work before and
-            // after?
+            // TODO: split in subregions, parallelize and chain work before
+            // and after?
             FillUnpopulatedTiles(settings, ref tileMap);
             
             PlaceTiles(TileType.Producer, settings.producerCount, ref tileMap, settings, ref random);
@@ -86,17 +85,12 @@ namespace DapperTest
             
             return newPosition;
         }
-        
-        private static bool IsWithinGrid(int2 position, int2 gridSize)
-        {
-            return
-                position.x >= 0 && position.x < gridSize.x &&
-                position.y >= 0 && position.y < gridSize.y;
-        }
-        
+
         private static bool IsViableMove(int2 position, GameSettings settings, Direction direction)
         {
-            return IsWithinGrid(MoveInDirection(position, direction), settings.gridSize);
+            return GridUtility.IsWithinGrid(
+                MoveInDirection(position, direction), 
+                settings.gridSize);
         }
         
         private static int GetViableDirectionCount(int2 position, GameSettings settings)
@@ -208,7 +202,7 @@ namespace DapperTest
                 }
 
                 int2 newPosition = MoveInDirection(position, direction);
-                bool newPositionIsOutOfBounds = !IsWithinGrid(newPosition, gridSize);
+                bool newPositionIsOutOfBounds = !GridUtility.IsWithinGrid(newPosition, gridSize);
 
                 if (newPositionIsOutOfBounds)
                 {
@@ -242,19 +236,19 @@ namespace DapperTest
             ref NativeParallelHashMap<int2, TileType> tileMap, GameSettings settings)
         {
             int2 pointAbove = MoveInDirection(mapPoint, Direction.Up);
-            if (IsWithinGrid(pointAbove, settings.gridSize) && tileMap[pointAbove] == tileType)
+            if (GridUtility.IsWithinGrid(pointAbove, settings.gridSize) && tileMap[pointAbove] == tileType)
                 return true;
             
             int2 pointRight = MoveInDirection(mapPoint, Direction.Right);
-            if (IsWithinGrid(pointRight, settings.gridSize) && tileMap[pointRight] == tileType)
+            if (GridUtility.IsWithinGrid(pointRight, settings.gridSize) && tileMap[pointRight] == tileType)
                 return true;
             
             int2 pointBelow = MoveInDirection(mapPoint, Direction.Down);
-            if (IsWithinGrid(pointBelow, settings.gridSize) && tileMap[pointBelow] == tileType)
+            if (GridUtility.IsWithinGrid(pointBelow, settings.gridSize) && tileMap[pointBelow] == tileType)
                 return true;
             
             int2 pointLeft = MoveInDirection(mapPoint, Direction.Left);
-            if (IsWithinGrid(pointLeft, settings.gridSize) && tileMap[pointLeft] == tileType)
+            if (GridUtility.IsWithinGrid(pointLeft, settings.gridSize) && tileMap[pointLeft] == tileType)
                 return true;
 
             return false;

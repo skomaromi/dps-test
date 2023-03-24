@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 278452016329797369}
   - component: {fileID: 278452016329797368}
   m_Layer: 0
-  m_Name: GameSettings
+  m_Name: Prefab_GameSettings
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

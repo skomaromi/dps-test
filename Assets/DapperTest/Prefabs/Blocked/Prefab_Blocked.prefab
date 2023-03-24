@@ -42,7 +42,7 @@ GameObject:
   m_Component:
   - component: {fileID: 619791357373107083}
   m_Layer: 0
-  m_Name: Blocked
+  m_Name: Prefab_Blocked
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

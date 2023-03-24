@@ -57,16 +57,20 @@ namespace DapperTest
 
             EntityQuery consumerQuery = GetEntityQuery(ComponentType.ReadOnly<Consumer>());
             
-            JobHandle connectionJob = new EstablishConsumerProducerConnectionJob()
+            JobHandle connectionJobHandle = new EstablishConsumerProducerConnectionJob()
             {
+                settings = settings,
                 gridSize = gridSize,
                 tileMap = tileMap,
                 producerEntities = producerEntities,
-                gridTranslationFromEntity = GetComponentDataFromEntity<GridTranslation>()
+                commandBuffer = commandBuffer,
+                gridTranslationFromEntity = GetComponentDataFromEntity<GridTranslation>(),
+                consumerReferenceBufferFromEntity = GetBufferFromEntity<ConsumerReference>(),
+                consumerProducerPathBufferFromEntity = GetBufferFromEntity<ConsumerProducerPathNode>()
             }.Schedule(consumerQuery);
-            
-            producerEntities.Dispose(connectionJob);
-            tileMap.Dispose(connectionJob);
+
+            producerEntities.Dispose(connectionJobHandle);
+            tileMap.Dispose(connectionJobHandle);
 
             // TODO: do we need this?
             // beginSimulationSystem.AddJobHandleForProducer(Dependency);

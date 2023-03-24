@@ -5,6 +5,9 @@ namespace DapperTest
         public int x;
         public int y;
         
+        // flat index in grid
+        public int index;
+        
         // cost to move from start node to current one
         public int gCost;
         // cost to move from current node to end node
