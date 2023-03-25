@@ -440,7 +440,10 @@ GameObject:
   - component: {fileID: 619791357373107083}
   - component: {fileID: -4897010719429585240}
   - component: {fileID: 6481238859783309781}
+  - component: {fileID: 1263072446873908187}
   - component: {fileID: -1111401585939043983}
+  - component: {fileID: -3402252680281017433}
+  - component: {fileID: 9060589865108029640}
   m_Layer: 0
   m_Name: Prefab_Consumer
   m_TagString: Untagged
@@ -491,6 +494,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd925f61d00448d7b3a0460855e84937, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  associatedProducerEntity: {fileID: 0}
+--- !u!114 &1263072446873908187
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5110459520864116338}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98b26e87b581431faaeb61d0718961a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  availableProductCount: 0
 --- !u!114 &-1111401585939043983
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -503,6 +520,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74c87090765b4abeae482c604664b5f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-3402252680281017433
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5110459520864116338}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5f124e925be46e6b34919e8921dbaab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &9060589865108029640
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5110459520864116338}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89b1638a10864fdbb04e7ceab15165e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  holder: {fileID: 0}
 --- !u!1 &7076458510054572025
 GameObject:
   m_ObjectHideFlags: 0

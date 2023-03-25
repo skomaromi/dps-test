@@ -1,7 +1,6 @@
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
-using UnityEngine;
 
 namespace DapperTest
 {
@@ -18,9 +17,8 @@ namespace DapperTest
         {
             GameSettings settings = GetSingleton<GameSettings>();
             BufferFromEntity<ConsumerProducerPathNode> consumerProducerPathBufferFromEntity = GetBufferFromEntity<ConsumerProducerPathNode>();
-            BufferFromEntity<ConsumerSlot> consumerSlotBufferFromEntity = GetBufferFromEntity<ConsumerSlot>();
-            ComponentDataFromEntity<Producer> producerFromEntity = GetComponentDataFromEntity<Producer>();
-            ComponentDataFromEntity<Consumer> consumerFromEntity = GetComponentDataFromEntity<Consumer>();
+            BufferFromEntity<ConsumerSlot> consumerSlotBufferFromEntity = GetBufferFromEntity<ConsumerSlot>(); GetComponentDataFromEntity<Producer>();
+            ComponentDataFromEntity<ProductCountData> productCountDataFromEntity = GetComponentDataFromEntity<ProductCountData>();
             EntityCommandBuffer commandBuffer = beginSimulationSystem.CreateCommandBuffer();
             double time = Time.ElapsedTime;
             
@@ -60,9 +58,10 @@ namespace DapperTest
                         
                         // remove one product
                         // ... from total available products
-                        Producer producer = producerFromEntity[producerEntity];
-                        producer.availableProductCount--;
-                        producerFromEntity[producerEntity] = producer;
+                        ProductCountData producerProductCountData = productCountDataFromEntity[producerEntity];
+                        producerProductCountData.availableProductCount--;
+                        productCountDataFromEntity[producerEntity] = producerProductCountData;
+                        ProductCountLabelUtility.MarkLabelNeedsUpdate(commandBuffer, producerEntity);
                         
                         // ... from own slot
                         DynamicBuffer<ConsumerSlot> consumerSlotBuffer = consumerSlotBufferFromEntity[producerEntity];
@@ -80,7 +79,6 @@ namespace DapperTest
 
                         vehicleMovement.targetBuildingType = BuildingType.Consumer;
                     }
-                    
                 }
                 else
                 {
@@ -105,9 +103,10 @@ namespace DapperTest
                     {
                         // handle consumer reached
                         // increment consumer product count
-                        Consumer consumer = consumerFromEntity[consumerEntity];
-                        consumer.availableProductCount++;
-                        commandBuffer.SetComponent(consumerEntity, consumer);
+                        ProductCountData consumerProductCountData = productCountDataFromEntity[consumerEntity];
+                        consumerProductCountData.availableProductCount++;
+                        commandBuffer.SetComponent(consumerEntity, consumerProductCountData);
+                        ProductCountLabelUtility.MarkLabelNeedsUpdate(commandBuffer, consumerEntity);
                         
                         // destroy self
                         commandBuffer.DestroyEntity(vehicleEntity);

@@ -6,6 +6,5 @@ namespace DapperTest
     public struct Consumer : IComponentData
     {
         public Entity associatedProducerEntity;
-        public int availableProductCount;
     }
 }

@@ -11,6 +11,5 @@ namespace DapperTest
         // state
         public int lastRecipientConsumerIndex;
         public double timeLastProduced;
-        public int availableProductCount;
     }
 }

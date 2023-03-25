@@ -4,11 +4,19 @@ namespace DapperTest
 {
     public partial class ProducerManagementSystem : SystemBase
     {
+        private BeginSimulationEntityCommandBufferSystem beginSimulationSystem;
+
+        protected override void OnCreate()
+        {
+            beginSimulationSystem = World.GetExistingSystem<BeginSimulationEntityCommandBufferSystem>();
+        }
+
         protected override void OnUpdate()
         {
             double time = Time.ElapsedTime;
-            
-            Entities.ForEach((DynamicBuffer<ConsumerSlot> consumerSlotBuffer, ref Producer producer) =>
+            EntityCommandBuffer.ParallelWriter commandBuffer = beginSimulationSystem.CreateCommandBuffer().AsParallelWriter();
+
+            Entities.ForEach((Entity producerEntity, int entityInQueryIndex, DynamicBuffer<ConsumerSlot> consumerSlotBuffer, ref Producer producer, ref ProductCountData productCountData) =>
             {
                 // has time for next production been reached?
                 // placement between these two points in time should be as shown
@@ -21,7 +29,8 @@ namespace DapperTest
                     return;
                 
                 // increment total available products
-                producer.availableProductCount++;
+                productCountData.availableProductCount++;
+                ProductCountLabelUtility.MarkLabelNeedsUpdate(commandBuffer, producerEntity, entityInQueryIndex);
 
                 // allocate product to next consumer
                 int consumerCount = consumerSlotBuffer.Length;
@@ -48,6 +57,8 @@ namespace DapperTest
                 
                 producer.timeLastProduced = time;
             }).ScheduleParallel();
+            
+            beginSimulationSystem.AddJobHandleForProducer(Dependency);
         }
     }
 }
