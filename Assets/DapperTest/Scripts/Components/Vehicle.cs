@@ -5,9 +5,6 @@ namespace DapperTest
     [GenerateAuthoringComponent]
     public struct Vehicle : IComponentData
     {
-        public Entity consumerEntity;
-        public Entity producerEntity;
-        public BuildingType targetBuildingType;
-        public int pathIndex;
+        public float movementIntervalSeconds;
     }
 }

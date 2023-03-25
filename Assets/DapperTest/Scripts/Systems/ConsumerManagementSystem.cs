@@ -58,13 +58,13 @@ namespace DapperTest
                     commandBuffer.SetComponent(vehicleInstance, translation);
                     
                     // vehicle data setup
-                    Vehicle vehicle = new Vehicle()
+                    VehicleMovement vehicleMovement = new VehicleMovement
                     {
                         consumerEntity = consumerEntity,
                         producerEntity = producerEntity,
                         targetBuildingType = BuildingType.Producer
                     };
-                    commandBuffer.SetComponent(vehicleInstance, vehicle);
+                    commandBuffer.AddComponent(vehicleInstance, vehicleMovement);
                     
                     consumerSlot.reservedProducts++;
                     consumerSlotBuffer[consumerSlotIndex] = consumerSlot;

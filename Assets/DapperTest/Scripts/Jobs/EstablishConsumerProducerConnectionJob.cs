@@ -42,7 +42,9 @@ namespace DapperTest
             GridTranslation consumerGridTranslation = gridTranslationFromEntity[consumerEntity];
             int2 consumerGridPosition = consumerGridTranslation.position;
 
-            int gridArea = gridSize.x * gridSize.y;
+            int gridWidth = gridSize.x;
+            int gridHeight = gridSize.y;
+            int gridArea = gridWidth * gridHeight;
             
             // allocate core pathfinding buffers
             NativeArray<PathNode> pathNodes = new NativeArray<PathNode>(gridArea, Allocator.Temp);
@@ -54,6 +56,7 @@ namespace DapperTest
             
             // seek nearest producer
             int nearestGCost = int.MaxValue;
+            int2 nearestProducerGridPosition = default;
             Entity nearestProducerEntity = default;
             
             for (int i = producerEntityCount - 1; i >= 0; i--)
@@ -74,6 +77,7 @@ namespace DapperTest
                 if (producerNode.gCost < nearestGCost)
                 {
                     nearestGCost = producerNode.gCost;
+                    nearestProducerGridPosition = producerGridPosition;
                     nearestProducerEntity = producerEntity;
                     BuildPath(producerNode, ref producerConsumerPath, ref pathNodes);
                 }
@@ -94,6 +98,9 @@ namespace DapperTest
             
             // deliberately iterating reverse to get a path from consumer to
             // producer
+            int startNodeIndex = ToFlatIndex(consumerGridPosition, gridWidth);
+            int endNodeIndex = ToFlatIndex(nearestProducerGridPosition, gridWidth);
+            
             for (int i = producerConsumerPath.Length - 1; i >= 0; i--)
             {
                 // store to consumer-producer path buffer
@@ -104,8 +111,12 @@ namespace DapperTest
                 };
                 consumerProducerPathBuffer.Add(consumerProducerPathNode);
                 
-                // paint road on tile map
-                tileMap[node] = TileType.Road;
+                // paint road on nodes along the path, except for starting and
+                // end nodes, where consumer and producer are located,
+                // respectively
+                int nodeIndex = ToFlatIndex(node, gridWidth);
+                if (nodeIndex != startNodeIndex && nodeIndex != endNodeIndex)
+                    tileMap[node] = TileType.Road;
             }
 
             // pathfinding buffers release
