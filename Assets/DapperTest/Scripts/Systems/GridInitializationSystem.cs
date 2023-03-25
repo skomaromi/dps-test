@@ -91,10 +91,7 @@ namespace DapperTest
                         continue;
                     
                     Entity entityInstance = commandBuffer.Instantiate(settings.GetTilePrefab(tileType));
-                    float3 tilePosition = new float3(
-                        settings.tileSize * gridPosition.x,
-                        0f,
-                        settings.tileSize * gridPosition.y);
+                    float3 tilePosition = settings.ConvertToWorldPosition(gridPosition);
                     Translation translation = new Translation() { Value = tilePosition };
                     commandBuffer.SetComponent(entityInstance, translation);
                 }

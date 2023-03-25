@@ -22,12 +22,7 @@ namespace DapperTest
                 Entity entityInstance = commandBuffer.Instantiate(settings.GetTilePrefab(pair.Value));
 
                 int2 tileCoordinates = pair.Key;
-                float tileSize = settings.tileSize;
-
-                float3 tilePosition = new float3(
-                    tileSize * tileCoordinates.x,
-                    0f,
-                    tileSize * tileCoordinates.y);
+                float3 tilePosition = settings.ConvertToWorldPosition(tileCoordinates);
 
                 Translation translation = new Translation() { Value = tilePosition };
                 commandBuffer.SetComponent(entityInstance, translation);
@@ -45,13 +40,9 @@ namespace DapperTest
 
                 Entity entityInstance = commandBuffer.Instantiate(settings.GetTilePrefab(tileType));
 
-                float tileSize = settings.tileSize;
                 int2 tileCoordinates = pair.Key;
 
-                float3 tilePosition = new float3(
-                    tileSize * tileCoordinates.x, 
-                    0f, 
-                    tileSize * tileCoordinates.y);
+                float3 tilePosition = settings.ConvertToWorldPosition(tileCoordinates);
                 
                 Translation translation = new Translation() { Value = tilePosition };
                 commandBuffer.SetComponent(entityInstance, translation);

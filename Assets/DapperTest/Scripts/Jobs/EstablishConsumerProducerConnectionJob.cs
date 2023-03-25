@@ -25,7 +25,7 @@ namespace DapperTest
         public BufferFromEntity<ConsumerSlot> consumerSlotBufferFromEntity;
         public BufferFromEntity<ConsumerProducerPathNode> consumerProducerPathBufferFromEntity;
 
-        private void Execute(Entity consumerEntity)
+        private void Execute(Entity consumerEntity, ref Consumer consumer)
         {
             // * find nearest producer
             // * add consumer entity ref to nearest producer for producer round
@@ -79,10 +79,15 @@ namespace DapperTest
                 }
             }
             
+            // producer-consumer setup
             // store consumer ref in nearest producer
             DynamicBuffer<ConsumerSlot> consumerSlotBuffer = consumerSlotBufferFromEntity[nearestProducerEntity];
             ConsumerSlot consumerSlot = new ConsumerSlot() { entity = consumerEntity };
             consumerSlotBuffer.Add(consumerSlot);
+            
+            // consumer-producer setup
+            // store producer ref in consumer
+            consumer.associatedProducerEntity = nearestProducerEntity;
             
             // store path to producer in consumer
             DynamicBuffer<ConsumerProducerPathNode> consumerProducerPathBuffer = consumerProducerPathBufferFromEntity[consumerEntity];

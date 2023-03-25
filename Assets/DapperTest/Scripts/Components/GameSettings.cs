@@ -54,5 +54,13 @@ namespace DapperTest
                     return Entity.Null;
             }
         }
+
+        public float3 ConvertToWorldPosition(int2 gridPosition)
+        {
+            return new float3(
+                tileSize * gridPosition.x, 
+                0f, 
+                tileSize * gridPosition.y);
+        }
     }
 }
