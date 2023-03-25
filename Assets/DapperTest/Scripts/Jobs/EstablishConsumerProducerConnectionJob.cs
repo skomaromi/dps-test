@@ -22,7 +22,7 @@ namespace DapperTest
 
         // getters
         public ComponentDataFromEntity<GridTranslation> gridTranslationFromEntity;
-        public BufferFromEntity<ConsumerReference> consumerReferenceBufferFromEntity;
+        public BufferFromEntity<ConsumerSlot> consumerSlotBufferFromEntity;
         public BufferFromEntity<ConsumerProducerPathNode> consumerProducerPathBufferFromEntity;
 
         private void Execute(Entity consumerEntity)
@@ -80,9 +80,9 @@ namespace DapperTest
             }
             
             // store consumer ref in nearest producer
-            DynamicBuffer<ConsumerReference> consumerReferenceBuffer = consumerReferenceBufferFromEntity[nearestProducerEntity];
-            ConsumerReference consumerReference = new ConsumerReference() { entity = consumerEntity };
-            consumerReferenceBuffer.Add(consumerReference);
+            DynamicBuffer<ConsumerSlot> consumerSlotBuffer = consumerSlotBufferFromEntity[nearestProducerEntity];
+            ConsumerSlot consumerSlot = new ConsumerSlot() { entity = consumerEntity };
+            consumerSlotBuffer.Add(consumerSlot);
             
             // store path to producer in consumer
             DynamicBuffer<ConsumerProducerPathNode> consumerProducerPathBuffer = consumerProducerPathBufferFromEntity[consumerEntity];

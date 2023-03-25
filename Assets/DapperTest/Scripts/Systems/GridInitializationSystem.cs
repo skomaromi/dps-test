@@ -63,9 +63,7 @@ namespace DapperTest
             NativeArray<Entity> producerEntities = producerQuery.ToEntityArray(Allocator.TempJob);
 
             EntityQuery consumerQuery = GetEntityQuery(ComponentType.ReadOnly<Consumer>());
-            
-            Debug.Log($"found {consumerQuery.CalculateEntityCount()} consumers.");
-            
+
             // TODO: don't schedule job if no producers
             // TODO: ScheduleParallel
             // TODO: try remove diagonal roads
@@ -75,7 +73,7 @@ namespace DapperTest
                 tileMap = tileMap,
                 producerEntities = producerEntities,
                 gridTranslationFromEntity = GetComponentDataFromEntity<GridTranslation>(),
-                consumerReferenceBufferFromEntity = GetBufferFromEntity<ConsumerReference>(),
+                consumerSlotBufferFromEntity = GetBufferFromEntity<ConsumerSlot>(),
                 consumerProducerPathBufferFromEntity = GetBufferFromEntity<ConsumerProducerPathNode>()
             }.Schedule(consumerQuery);
 

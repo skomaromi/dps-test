@@ -294,6 +294,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 586c7be813fa4f78820a22e08224931c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  productionIntervalSeconds: 1
+  lastRecipientConsumerIndex: -1
+  timeLastProduced: 0
+  availableProductCount: 0
 --- !u!114 &-6492550589568050549
 MonoBehaviour:
   m_ObjectHideFlags: 0

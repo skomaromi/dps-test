@@ -3,11 +3,11 @@ using UnityEngine;
 
 namespace DapperTest
 {
-    public class ConsumerReferenceAuthoring : MonoBehaviour, IConvertGameObjectToEntity
+    public class ConsumerSlotAuthoring : MonoBehaviour, IConvertGameObjectToEntity
     {
         public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
         {
-            dstManager.AddBuffer<ConsumerReference>(entity);
+            dstManager.AddBuffer<ConsumerSlot>(entity);
         }
     }
 }

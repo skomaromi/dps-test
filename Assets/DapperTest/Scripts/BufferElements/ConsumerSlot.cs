@@ -2,8 +2,9 @@ using Unity.Entities;
 
 namespace DapperTest
 {
-    public struct ConsumerReference : IBufferElementData
+    public struct ConsumerSlot : IBufferElementData
     {
         public Entity entity;
+        public int availableProducts;
     }
 }
