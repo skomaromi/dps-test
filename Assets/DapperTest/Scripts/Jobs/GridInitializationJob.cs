@@ -232,28 +232,6 @@ namespace DapperTest
             }
         }
         
-        private static bool AnyAdjacentTileIsType(int2 mapPoint, TileType tileType,
-            ref NativeParallelHashMap<int2, TileType> tileMap, GameSettings settings)
-        {
-            int2 pointAbove = MoveInDirection(mapPoint, Direction.Up);
-            if (GridUtility.IsWithinGrid(pointAbove, settings.gridSize) && tileMap[pointAbove] == tileType)
-                return true;
-            
-            int2 pointRight = MoveInDirection(mapPoint, Direction.Right);
-            if (GridUtility.IsWithinGrid(pointRight, settings.gridSize) && tileMap[pointRight] == tileType)
-                return true;
-            
-            int2 pointBelow = MoveInDirection(mapPoint, Direction.Down);
-            if (GridUtility.IsWithinGrid(pointBelow, settings.gridSize) && tileMap[pointBelow] == tileType)
-                return true;
-            
-            int2 pointLeft = MoveInDirection(mapPoint, Direction.Left);
-            if (GridUtility.IsWithinGrid(pointLeft, settings.gridSize) && tileMap[pointLeft] == tileType)
-                return true;
-
-            return false;
-        }
-        
         private static void PlaceTiles(TileType tileType, int tileCount,
             ref NativeParallelHashMap<int2, TileType> tileMap, GameSettings settings, ref Random random)
         {
@@ -263,8 +241,7 @@ namespace DapperTest
             {
                 int2 mapPoint = GetRandomPointInGrid(ref random, settings);
                 
-                if (tileMap[mapPoint] != TileType.Blocked && 
-                    !AnyAdjacentTileIsType(mapPoint, TileType.Blocked, ref tileMap, settings))
+                if (tileMap[mapPoint] != TileType.Blocked)
                     continue;
 
                 tileMap[mapPoint] = tileType;
