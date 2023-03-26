@@ -6,7 +6,7 @@ using Random = Unity.Mathematics.Random;
 
 namespace DapperTest
 {
-    public struct GridInitializationJob : IJob
+    public struct InitialGridPopulationJob : IJob
     {
         public GameSettings settings;
         public Entity settingsEntity;
@@ -28,9 +28,6 @@ namespace DapperTest
             GridUtility.SpawnPrefabs(settings, ref commandBuffer, ref tileMap, TileType.Empty);
             GridUtility.SpawnPrefabs(settings, ref commandBuffer, ref tileMap, TileType.Producer);
             GridUtility.SpawnPrefabs(settings, ref commandBuffer, ref tileMap, TileType.Consumer);
-
-            // add tag to mark grid as initialized
-            commandBuffer.AddComponent<GridInitializedTag>(settingsEntity);
         }
         
         private static Direction GetRandomDirection(ref Random random)

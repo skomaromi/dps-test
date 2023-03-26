@@ -14,20 +14,6 @@ namespace DapperTest
                 position.x >= 0 && position.x < gridSize.x &&
                 position.y >= 0 && position.y < gridSize.y;
         }
-        
-        public static void SpawnPrefabs(GameSettings settings, ref EntityCommandBuffer commandBuffer, ref NativeParallelHashMap<int2, TileType> tileMap)
-        {
-            foreach (KeyValue<int2, TileType> pair in tileMap)
-            {
-                Entity entityInstance = commandBuffer.Instantiate(settings.GetTilePrefab(pair.Value));
-
-                int2 tileCoordinates = pair.Key;
-                float3 tilePosition = settings.ConvertToWorldPosition(tileCoordinates);
-
-                Translation translation = new Translation() { Value = tilePosition };
-                commandBuffer.SetComponent(entityInstance, translation);
-            }
-        }
 
         public static void SpawnPrefabs(GameSettings settings, ref EntityCommandBuffer commandBuffer, ref NativeParallelHashMap<int2, TileType> tileMap, TileType tileTypeToSpawn)
         {

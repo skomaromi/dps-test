@@ -18,10 +18,10 @@ namespace DapperTest
             Entities
                 .WithAny<ProductCountLabelNeedsUpdateTag>()
                 .ForEach((Entity entity, ProductCountLabelHolder holder, in ProductCountData productCountData) =>
-                {
-                    holder.label.SetAvailableProductsCount(productCountData.availableProductCount); 
-                    commandBuffer.RemoveComponent<ProductCountLabelNeedsUpdateTag>(entity);
-                }).WithoutBurst().Run();
+            {
+                holder.label.SetAvailableProductsCount(productCountData.availableProductCount); 
+                commandBuffer.RemoveComponent<ProductCountLabelNeedsUpdateTag>(entity);
+            }).WithoutBurst().Run();
         }
     }
 }

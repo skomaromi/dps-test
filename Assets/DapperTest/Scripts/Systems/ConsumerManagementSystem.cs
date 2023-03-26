@@ -11,13 +11,13 @@ namespace DapperTest
         protected override void OnCreate()
         {
             beginSimulationSystem = World.GetExistingSystem<BeginSimulationEntityCommandBufferSystem>();
+            
+            RequireForUpdate(GetEntityQuery(GridInitializationSystem.InitializationCompletedQueryTypes));
         }
 
         protected override void OnUpdate()
         {
             GameSettings settings = GetSingleton<GameSettings>();
-            // TODO: parallelize. move to a separate job and try removing race condition restriction by attribute
-            // https://coffeebraingames.wordpress.com/2021/05/09/how-to-run-jobs-using-componentdatafromentity-in-parallel/
             BufferFromEntity<ConsumerSlot> consumerSlotBufferFromEntity = GetBufferFromEntity<ConsumerSlot>();
             EntityCommandBuffer commandBuffer = beginSimulationSystem.CreateCommandBuffer();
             

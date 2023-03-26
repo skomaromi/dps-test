@@ -1,25 +1,45 @@
 using System.Diagnostics;
 using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
-using Unity.Transforms;
 using Random = Unity.Mathematics.Random;
 
 namespace DapperTest
 {
     public partial class GridInitializationSystem : SystemBase
     {
+        private enum InitializationStep
+        {
+            InitialGridPopulation,
+            InitialGridPopulationScheduled,
+            EstablishConsumerProducerConnections,
+            EstablishingConsumerProducerConnectionsScheduled,
+            PaintTiles
+        }
+        
+        public static readonly ComponentType[] InitializationCompletedQueryTypes = new ComponentType[]
+        {
+            ComponentType.ReadOnly<GameSettings>(),
+            ComponentType.ReadOnly<GridInitializationCompletedTag>()
+        };
+        
         private BeginSimulationEntityCommandBufferSystem beginSimulationSystem;
 
+        private InitializationStep initializationStep;
+        private NativeParallelHashMap<int2, TileType> tileMap;
+        
+        // job handles
+        private JobHandle initialGridPopulationJobHandle;
+        private JobHandle connectionJobHandle;
+        
         protected override void OnCreate()
         {
             beginSimulationSystem = World.GetOrCreateSystem<BeginSimulationEntityCommandBufferSystem>();
             
             EntityQuery query = GetEntityQuery(
                 ComponentType.ReadOnly<GameSettings>(),
-                ComponentType.Exclude<GridInitializedTag>()
+                ComponentType.Exclude<GridInitializationCompletedTag>()
             );
             
             RequireForUpdate(query);
@@ -27,80 +47,117 @@ namespace DapperTest
 
         protected override void OnUpdate()
         {
+            switch (initializationStep)
+            {
+                case InitializationStep.InitialGridPopulation:
+                    StartInitialGridPopulation();
+                    break;
+                
+                case InitializationStep.InitialGridPopulationScheduled:
+                    UpdateInitialGridPopulationScheduled();
+                    break;
+                
+                case InitializationStep.EstablishConsumerProducerConnections:
+                    StartEstablishingProducerConsumerConnections();
+                    break;
+                
+                case InitializationStep.EstablishingConsumerProducerConnectionsScheduled:
+                    UpdateEstablishingConsumerProducerConnectionsScheduled();
+                    break;
+                
+                case InitializationStep.PaintTiles:
+                    StartPaintingTiles();
+                    break;
+            }
+        }
+
+        private void StartInitialGridPopulation()
+        {
             GameSettings settings = GetSingleton<GameSettings>();
             Entity settingsEntity = GetSingletonEntity<GameSettings>();
 
             int2 gridSize = settings.gridSize;
             int gridArea = gridSize.x * gridSize.y;
+            
+            tileMap = new NativeParallelHashMap<int2, TileType>(gridArea, Allocator.Persistent);
 
-            NativeParallelHashMap<int2, TileType> tileMap =
-                new NativeParallelHashMap<int2, TileType>(gridArea, Allocator.TempJob);
-
-            EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.TempJob);
+            EntityCommandBuffer commandBuffer = beginSimulationSystem.CreateCommandBuffer();
             
             Random random = new Random((uint)Stopwatch.GetTimestamp());
 
-            // TODO: separate thread
-            GridInitializationJob gridInitializationJob = new GridInitializationJob()
+            initialGridPopulationJobHandle = new InitialGridPopulationJob()
             {
                 settings = settings,
                 settingsEntity = settingsEntity,
                 tileMap = tileMap,
                 commandBuffer = commandBuffer,
                 random = random
-            };
-            gridInitializationJob.Run();
-            
-            commandBuffer.Playback(EntityManager);
-            commandBuffer.Dispose();
+            }.Schedule(Dependency);
 
+            beginSimulationSystem.AddJobHandleForProducer(initialGridPopulationJobHandle);
+            Dependency = initialGridPopulationJobHandle;
+
+            initializationStep = InitializationStep.InitialGridPopulationScheduled;
+        }
+        
+        private void UpdateInitialGridPopulationScheduled()
+        {
+            if (initialGridPopulationJobHandle.IsCompleted)
+                initializationStep = InitializationStep.EstablishConsumerProducerConnections;
+        }
+        
+        private void StartEstablishingProducerConsumerConnections()
+        {
+            GameSettings settings = GetSingleton<GameSettings>();
+
+            // no producers to associate consumers with, skip to next step
+            if (settings.producerCount == 0)
+            {
+                initializationStep = InitializationStep.PaintTiles;
+                return;
+            }
+            
             EntityQuery producerQuery = GetEntityQuery(ComponentType.ReadWrite<Producer>());
             NativeArray<Entity> producerEntities = producerQuery.ToEntityArray(Allocator.TempJob);
 
-            EntityQuery consumerQuery = GetEntityQuery(ComponentType.ReadOnly<Consumer>());
-
-            // TODO: don't schedule job if no producers
-            // TODO: ScheduleParallel
-            // TODO: try remove diagonal roads
-            JobHandle connectionJobHandle = new EstablishConsumerProducerConnectionJob()
+            connectionJobHandle = new EstablishConsumerProducerConnectionJob()
             {
-                gridSize = gridSize,
+                gridSize = settings.gridSize,
                 tileMap = tileMap,
                 producerEntities = producerEntities,
                 gridTranslationFromEntity = GetComponentDataFromEntity<GridTranslation>(),
                 consumerSlotBufferFromEntity = GetBufferFromEntity<ConsumerSlot>(),
-                consumerProducerPathBufferFromEntity = GetBufferFromEntity<ConsumerProducerPathNode>()
-            }.Schedule(consumerQuery);
-
-            commandBuffer = new EntityCommandBuffer(Allocator.TempJob);
-            
-            JobHandle floorPaintingJobHandle = Job.WithCode(() =>
-            {
-                foreach (KeyValue<int2, TileType> pair in tileMap)
-                {
-                    int2 gridPosition = pair.Key;
-                    TileType tileType = pair.Value;
-
-                    if (tileType != TileType.Road && 
-                        tileType != TileType.Blocked) 
-                        continue;
-                    
-                    Entity entityInstance = commandBuffer.Instantiate(settings.GetTilePrefab(tileType));
-                    float3 tilePosition = settings.ConvertToWorldPosition(gridPosition);
-                    Translation translation = new Translation() { Value = tilePosition };
-                    commandBuffer.SetComponent(entityInstance, translation);
-                }
-            }).Schedule(connectionJobHandle);
+                consumerProducerPathBufferFromEntity = GetBufferFromEntity<ConsumerProducerPathNode>(),
+            }.Schedule(Dependency);
 
             producerEntities.Dispose(connectionJobHandle);
-            tileMap.Dispose(floorPaintingJobHandle);
             
-            floorPaintingJobHandle.Complete();
-            commandBuffer.Playback(EntityManager);
-            commandBuffer.Dispose();
+            beginSimulationSystem.AddJobHandleForProducer(connectionJobHandle);
+            Dependency = connectionJobHandle;
+            
+            initializationStep = InitializationStep.EstablishingConsumerProducerConnectionsScheduled;
+        }
+        
+        private void UpdateEstablishingConsumerProducerConnectionsScheduled()
+        {
+            if (connectionJobHandle.IsCompleted)
+                initializationStep = InitializationStep.PaintTiles;
+        }
 
-            // TODO: do we need this?
-            // beginSimulationSystem.AddJobHandleForProducer(Dependency);
+        private void StartPaintingTiles()
+        {
+            JobHandle tilePaintingJobHandle = new TilePaintingJob()
+            {
+                tileMap = tileMap,
+                commandBuffer = beginSimulationSystem.CreateCommandBuffer(),
+                settings = GetSingleton<GameSettings>(),
+                settingsEntity = GetSingletonEntity<GameSettings>()
+            }.Schedule(Dependency);
+
+            tileMap.Dispose(tilePaintingJobHandle);
+            
+            beginSimulationSystem.AddJobHandleForProducer(tilePaintingJobHandle);
+            Dependency = tilePaintingJobHandle;
         }
     }
 }

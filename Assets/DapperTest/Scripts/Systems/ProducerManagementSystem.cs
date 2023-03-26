@@ -9,6 +9,8 @@ namespace DapperTest
         protected override void OnCreate()
         {
             beginSimulationSystem = World.GetExistingSystem<BeginSimulationEntityCommandBufferSystem>();
+            
+            RequireForUpdate(GetEntityQuery(GridInitializationSystem.InitializationCompletedQueryTypes));
         }
 
         protected override void OnUpdate()

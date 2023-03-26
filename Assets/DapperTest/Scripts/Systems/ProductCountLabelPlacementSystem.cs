@@ -16,12 +16,13 @@ namespace DapperTest
         {
             EntityCommandBuffer commandBuffer = beginSimulationSystem.CreateCommandBuffer();
             
-            Entities.WithAny<NeedsProductCountLabelTag>()
+            Entities
+                .WithAny<NeedsProductCountLabelTag>()
                 .ForEach((Entity entity, ProductCountLabelHolder holder, in Translation translation) =>
-                {
-                    holder.label = ProductCountLabelManager.Instance.InstantiateLabel(translation.Value);
-                    commandBuffer.RemoveComponent<NeedsProductCountLabelTag>(entity);
-                }).WithoutBurst().Run();
+            {
+                holder.label = ProductCountLabelManager.Instance.InstantiateLabel(translation.Value);
+                commandBuffer.RemoveComponent<NeedsProductCountLabelTag>(entity);
+            }).WithoutBurst().Run();
         }
     }
 }
