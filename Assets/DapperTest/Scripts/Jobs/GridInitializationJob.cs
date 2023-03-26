@@ -39,17 +39,10 @@ namespace DapperTest
         {
             return (Direction)random.NextInt(0, (int)Direction.Left);
         }
-        
-        private static int2 GetNextInt2(ref Random random, int minX, int minY, int maxX, int maxY)
-        {
-            return random.NextInt2(
-                new int2(minX, minY), 
-                new int2(maxX, maxY));
-        }
-        
+
         private static int2 GetRandomPointInGrid(ref Random random, GameSettings settings)
         {
-            return GetNextInt2(ref random, 0, 0, settings.gridSize.x, settings.gridSize.y);
+            return random.NextInt2(int2.zero, settings.gridSize);
         }
         
         private static int2 MoveInDirection(int2 position, Direction direction)
