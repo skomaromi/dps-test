@@ -5,7 +5,7 @@ namespace DapperTest
 {
     public class ProductCountLabel : MonoBehaviour
     {
-        [SerializeField] private TextMeshPro label;
+        [SerializeField] private TMP_Text label;
 
         public void SetAvailableProductsCount(int count)
         {
