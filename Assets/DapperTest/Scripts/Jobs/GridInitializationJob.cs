@@ -25,7 +25,7 @@ namespace DapperTest
             
             PlaceTiles(TileType.Producer, settings.producerCount, ref tileMap, settings, ref random);
             PlaceTiles(TileType.Consumer, settings.consumerCount, ref tileMap, settings, ref random);
-                
+            
             // TODO: NOT optimal. use flags
             GridUtility.SpawnPrefabs(settings, ref commandBuffer, ref tileMap, TileType.Empty);
             GridUtility.SpawnPrefabs(settings, ref commandBuffer, ref tileMap, TileType.Producer);
