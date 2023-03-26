@@ -141,6 +141,63 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ConversionMode: 0
+--- !u!1001 &108499373
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1295424515541236633, guid: 55f8cc66a7ce3a249b92bb5938c2f379, type: 3}
+      propertyPath: m_Name
+      value: Prefab_AerialCamera
+      objectReference: {fileID: 0}
+    - target: {fileID: 1295424515541236636, guid: 55f8cc66a7ce3a249b92bb5938c2f379, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1295424515541236636, guid: 55f8cc66a7ce3a249b92bb5938c2f379, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1295424515541236636, guid: 55f8cc66a7ce3a249b92bb5938c2f379, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 1295424515541236636, guid: 55f8cc66a7ce3a249b92bb5938c2f379, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1295424515541236636, guid: 55f8cc66a7ce3a249b92bb5938c2f379, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.8535535
+      objectReference: {fileID: 0}
+    - target: {fileID: 1295424515541236636, guid: 55f8cc66a7ce3a249b92bb5938c2f379, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.35355338
+      objectReference: {fileID: 0}
+    - target: {fileID: 1295424515541236636, guid: 55f8cc66a7ce3a249b92bb5938c2f379, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.35355338
+      objectReference: {fileID: 0}
+    - target: {fileID: 1295424515541236636, guid: 55f8cc66a7ce3a249b92bb5938c2f379, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.1464466
+      objectReference: {fileID: 0}
+    - target: {fileID: 1295424515541236636, guid: 55f8cc66a7ce3a249b92bb5938c2f379, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 1295424515541236636, guid: 55f8cc66a7ce3a249b92bb5938c2f379, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 1295424515541236636, guid: 55f8cc66a7ce3a249b92bb5938c2f379, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 55f8cc66a7ce3a249b92bb5938c2f379, type: 3}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -256,35 +313,6 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
---- !u!1001 &1267324822
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 1295424515541236633, guid: 55f8cc66a7ce3a249b92bb5938c2f379, type: 3}
-      propertyPath: m_Name
-      value: Prefab_Camera
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295424515541236636, guid: 55f8cc66a7ce3a249b92bb5938c2f379, type: 3}
-      propertyPath: m_RootOrder
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295424515541236636, guid: 55f8cc66a7ce3a249b92bb5938c2f379, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295424515541236636, guid: 55f8cc66a7ce3a249b92bb5938c2f379, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295424515541236636, guid: 55f8cc66a7ce3a249b92bb5938c2f379, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 55f8cc66a7ce3a249b92bb5938c2f379, type: 3}
 --- !u!1001 &1411632745
 PrefabInstance:
   m_ObjectHideFlags: 0
