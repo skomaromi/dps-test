@@ -5,7 +5,6 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
-using Debug = UnityEngine.Debug;
 using Random = Unity.Mathematics.Random;
 
 namespace DapperTest
@@ -19,15 +18,13 @@ namespace DapperTest
             beginSimulationSystem = World.GetOrCreateSystem<BeginSimulationEntityCommandBufferSystem>();
             
             EntityQuery query = GetEntityQuery(
-                ComponentType.ReadWrite<GameSettings>(),
+                ComponentType.ReadOnly<GameSettings>(),
                 ComponentType.Exclude<GridInitializedTag>()
             );
             
             RequireForUpdate(query);
         }
 
-        // TODO: ensure this does not run more than once after entire map
-        // init is done
         protected override void OnUpdate()
         {
             GameSettings settings = GetSingleton<GameSettings>();
@@ -40,8 +37,7 @@ namespace DapperTest
                 new NativeParallelHashMap<int2, TileType>(gridArea, Allocator.TempJob);
 
             EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.TempJob);
-
-            // TODO: there are better ways to do this?
+            
             Random random = new Random((uint)Stopwatch.GetTimestamp());
 
             // TODO: separate thread
@@ -55,7 +51,6 @@ namespace DapperTest
             };
             gridInitializationJob.Run();
             
-            // TODO: could be done more elegant if EstablishConsumerProducerConnectionJob spawn moved to another system which waits for GridInitializedTag
             commandBuffer.Playback(EntityManager);
             commandBuffer.Dispose();
 

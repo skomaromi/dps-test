@@ -19,8 +19,6 @@ namespace DapperTest
         {
             WalkMap(settings, ref tileMap, ref random);
             
-            // TODO: split in subregions, parallelize and chain work before
-            // and after?
             FillUnpopulatedTiles(settings, ref tileMap);
             
             PlaceTiles(TileType.Producer, settings.producerCount, ref tileMap, settings, ref random);

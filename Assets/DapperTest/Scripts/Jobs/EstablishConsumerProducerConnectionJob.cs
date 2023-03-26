@@ -31,7 +31,7 @@ namespace DapperTest
             // * add consumer entity ref to nearest producer for producer round
             //   robin
             // * store path to nearest producer in consumer entity
-            //   (DynamicBuffer)
+            //   (stored as positional nodes in consumer's DynamicBuffer)
             // * paint tilemap with road tiles from consumer to nearest producer
             
             int producerEntityCount = producerEntities.Length;
