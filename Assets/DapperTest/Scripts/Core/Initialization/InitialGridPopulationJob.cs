@@ -189,10 +189,8 @@ namespace DapperTest
 
                 if (tileMap.TryAdd(position, TileType.Blocked)) 
                     emptyTiles--;
-
-                // TODO: might secretly bump head a few times into the same wall, rework logic to change direction
-                // the first time it does that
-                bool shouldChangeDirection = random.NextBool() || forceChangeDirection;
+                
+                bool shouldChangeDirection = forceChangeDirection || random.NextBool();
 
                 if (shouldChangeDirection)
                 {
