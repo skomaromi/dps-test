@@ -33,7 +33,6 @@ namespace DapperTest
                 Translation translation = new Translation() { Value = tilePosition };
                 commandBuffer.SetComponent(entityInstance, translation);
                 
-                // TODO: `if` on every foreach iteration, refactor?
                 if (tileType == TileType.Producer || 
                     tileType == TileType.Consumer)
                 {

@@ -72,37 +72,51 @@ namespace DapperTest
             
             return newPosition;
         }
-
-        private static bool IsViableMove(int2 position, GameSettings settings, Direction direction)
-        {
-            return GridUtility.IsWithinGrid(
-                MoveInDirection(position, direction), 
-                settings.gridSize);
-        }
         
-        private static int GetViableDirectionCount(int2 position, GameSettings settings)
+        private static bool IsViableMove(int2 position, int2 gridSize, Direction direction)
+        {
+            switch (direction)
+            {
+                case Direction.Up:
+                    return position.y + 1 < gridSize.y;
+                
+                case Direction.Right:
+                    return position.x + 1 < gridSize.x;
+                
+                case Direction.Down:
+                    return position.y - 1 >= 0;
+                
+                case Direction.Left:
+                    return position.x - 1 >= 0;
+                
+                default:
+                    return false;
+            }
+        }
+
+        private static int GetViableDirectionCount(int2 position, int2 gridSize)
         {
             int viableDirectionCount = 0;
 
-            if (IsViableMove(position, settings, Direction.Up))
+            if (IsViableMove(position, gridSize, Direction.Up))
                 viableDirectionCount++;
-            if (IsViableMove(position, settings, Direction.Right))
+            if (IsViableMove(position, gridSize, Direction.Right))
                 viableDirectionCount++;
-            if (IsViableMove(position, settings, Direction.Down))
+            if (IsViableMove(position, gridSize, Direction.Down))
                 viableDirectionCount++;
-            if (IsViableMove(position, settings, Direction.Left))
+            if (IsViableMove(position, gridSize, Direction.Left))
                 viableDirectionCount++;
 
             return viableDirectionCount;
         }
         
-        private static Direction GetViableDirection(int directionIndex, int2 position, GameSettings settings)
+        private static Direction GetViableDirection(int directionIndex, int2 position, int2 gridSize)
         {
             int candidateIndex = -1;
 
             bool CheckNext(Direction direction)
             {
-                if (!IsViableMove(position, settings, direction)) 
+                if (!IsViableMove(position, gridSize, direction)) 
                     return false;
                 
                 candidateIndex++;
@@ -121,13 +135,11 @@ namespace DapperTest
             return Direction.Left;
         }
         
-        // TODO: make more efficient. IsViableMove could directly compute destination position and check if hits
-        // the corresponding wall (e.g. for `up` just check incremented y against gridSize)
-        private static Direction GetRandomViableDirection(ref Random random, int2 position, GameSettings settings)
+        private static Direction GetRandomViableDirection(ref Random random, int2 position, int2 gridSize)
         {
-            int viableDirectionCount = GetViableDirectionCount(position, settings);
+            int viableDirectionCount = GetViableDirectionCount(position, gridSize);
             int directionIndex = random.NextInt(0, viableDirectionCount);
-            return GetViableDirection(directionIndex, position, settings);
+            return GetViableDirection(directionIndex, position, gridSize);
         }
         
         private static void WalkMap(GameSettings settings, ref NativeParallelHashMap<int2, TileType> tileMap,
@@ -184,7 +196,7 @@ namespace DapperTest
 
                 if (shouldChangeDirection)
                 {
-                    direction = GetRandomViableDirection(ref random, position, settings);
+                    direction = GetRandomViableDirection(ref random, position, gridSize);
                     forceChangeDirection = false;
                 }
 
