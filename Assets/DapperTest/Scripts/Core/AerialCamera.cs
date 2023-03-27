@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace DapperTest
 {
@@ -16,8 +17,8 @@ namespace DapperTest
         [SerializeField] private float fastPanSpeed;
 
         [Header("Zoom Settings")]
-        [SerializeField] private float minZoom;
-        [SerializeField] private float maxZoom;
+        [SerializeField] private float minSize;
+        [SerializeField] private float maxSize;
         [SerializeField] private float zoomSpeed;
 
         private Vector3 initialPosition;
@@ -25,14 +26,16 @@ namespace DapperTest
 
         private void Awake()
         {
-            StoreInitialValues();
+            StoreDefaultValues();
+
+            camera.orthographicSize = maxSize;
         }
         
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.Home) || Input.GetKeyDown(KeyCode.R))
             {
-                ResetToInitialValues();
+                ResetToDefaultValues();
                 return;
             }
             
@@ -40,16 +43,15 @@ namespace DapperTest
             HandleZoom();
         }
         
-        private void StoreInitialValues()
+        private void StoreDefaultValues()
         {
             initialPosition = transform.position;
-            initialZoom = camera.orthographicSize;
         }
 
-        private void ResetToInitialValues()
+        private void ResetToDefaultValues()
         {
             transform.position = initialPosition;
-            camera.orthographicSize = initialZoom;
+            camera.orthographicSize = maxSize;
         }
 
         private void HandlePan()
@@ -83,7 +85,7 @@ namespace DapperTest
             zoomInput = -zoomInput;
 
             float newOrthoSize = camera.orthographicSize + zoomInput * zoomSpeed * Time.deltaTime;
-            newOrthoSize = Mathf.Clamp(newOrthoSize, minZoom, maxZoom);
+            newOrthoSize = Mathf.Clamp(newOrthoSize, minSize, maxSize);
 
             camera.orthographicSize = newOrthoSize;
         }

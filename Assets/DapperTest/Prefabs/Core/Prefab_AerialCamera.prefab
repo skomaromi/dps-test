@@ -134,6 +134,6 @@ MonoBehaviour:
   camera: {fileID: 1295424515541236635}
   regularPanSpeed: 40
   fastPanSpeed: 80
-  minZoom: 5
-  maxZoom: 50
+  minSize: 5
+  maxSize: 50
   zoomSpeed: 1000
