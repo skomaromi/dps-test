@@ -74,7 +74,6 @@ namespace DapperTest
         private void StartInitialGridPopulation()
         {
             GameSettings settings = GetSingleton<GameSettings>();
-            Entity settingsEntity = GetSingletonEntity<GameSettings>();
 
             int2 gridSize = settings.gridSize;
             int gridArea = gridSize.x * gridSize.y;
@@ -88,7 +87,6 @@ namespace DapperTest
             initialGridPopulationJobHandle = new InitialGridPopulationJob()
             {
                 settings = settings,
-                settingsEntity = settingsEntity,
                 tileMap = tileMap,
                 commandBuffer = commandBuffer,
                 random = random

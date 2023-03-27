@@ -15,13 +15,13 @@ namespace DapperTest
                 position.y >= 0 && position.y < gridSize.y;
         }
 
-        public static void SpawnPrefabs(GameSettings settings, ref EntityCommandBuffer commandBuffer, ref NativeParallelHashMap<int2, TileType> tileMap, TileType tileTypeToSpawn)
+        public static void SpawnPrefabs(GameSettings settings, ref EntityCommandBuffer commandBuffer, ref NativeParallelHashMap<int2, TileType> tileMap, TileType tileTypeMask)
         {
             foreach (KeyValue<int2, TileType> pair in tileMap)
             {
                 TileType tileType = pair.Value;
                 
-                if (tileType != tileTypeToSpawn)
+                if (!tileTypeMask.HasFlag(tileType))
                     continue;
 
                 Entity entityInstance = commandBuffer.Instantiate(settings.GetTilePrefab(tileType));
@@ -34,7 +34,8 @@ namespace DapperTest
                 commandBuffer.SetComponent(entityInstance, translation);
                 
                 // TODO: `if` on every foreach iteration, refactor?
-                if (tileType == TileType.Producer || tileType == TileType.Consumer)
+                if (tileType == TileType.Producer || 
+                    tileType == TileType.Consumer)
                 {
                     // configure GridTranslation
                     GridTranslation gridTranslation = new GridTranslation()

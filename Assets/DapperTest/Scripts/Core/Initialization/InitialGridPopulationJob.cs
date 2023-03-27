@@ -9,8 +9,6 @@ namespace DapperTest
     public struct InitialGridPopulationJob : IJob
     {
         public GameSettings settings;
-        public Entity settingsEntity;
-            
         public NativeParallelHashMap<int2, TileType> tileMap;
         public EntityCommandBuffer commandBuffer;
         public Random random;
@@ -24,10 +22,11 @@ namespace DapperTest
             PlaceTiles(TileType.Producer, settings.producerCount, ref tileMap, settings, ref random);
             PlaceTiles(TileType.Consumer, settings.consumerCount, ref tileMap, settings, ref random);
             
-            // TODO: NOT optimal. use flags
-            GridUtility.SpawnPrefabs(settings, ref commandBuffer, ref tileMap, TileType.Empty);
-            GridUtility.SpawnPrefabs(settings, ref commandBuffer, ref tileMap, TileType.Producer);
-            GridUtility.SpawnPrefabs(settings, ref commandBuffer, ref tileMap, TileType.Consumer);
+            GridUtility.SpawnPrefabs(
+                settings, 
+                ref commandBuffer, 
+                ref tileMap, 
+                TileType.Empty | TileType.Producer | TileType.Consumer);
         }
         
         private static Direction GetRandomDirection(ref Random random)
