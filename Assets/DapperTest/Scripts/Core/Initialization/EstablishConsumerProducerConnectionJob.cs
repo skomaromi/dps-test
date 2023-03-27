@@ -131,7 +131,7 @@ namespace DapperTest
         private NativeArray<int2> GenerateNeighbourOffsets()
         {
             NativeArray<int2> neighbourOffsets = new NativeArray<int2>(
-                8, 
+                4, 
                 Allocator.Temp
             );
             
@@ -139,10 +139,6 @@ namespace DapperTest
             neighbourOffsets[1] = new int2(1, 0);   // right
             neighbourOffsets[2] = new int2(0, 1);   // up
             neighbourOffsets[3] = new int2(0, -1);  // down
-            neighbourOffsets[4] = new int2(-1, -1); // left down
-            neighbourOffsets[5] = new int2(-1, 1);  // left up
-            neighbourOffsets[6] = new int2(1, -1);  // right down
-            neighbourOffsets[7] = new int2(1, 1);   // right up
 
             return neighbourOffsets;
         }
