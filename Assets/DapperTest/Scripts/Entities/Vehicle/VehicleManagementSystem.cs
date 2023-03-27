@@ -29,8 +29,10 @@ namespace DapperTest
                     return;
 
                 Entity consumerEntity = vehicleMovement.consumerEntity;
+
+                BuildingType targetBuildingType = vehicleMovement.targetBuildingType;
                 
-                if (vehicleMovement.targetBuildingType == BuildingType.Producer)
+                if (targetBuildingType == BuildingType.Producer)
                 {
                     // going from consumer to producer
                     // increment along path
@@ -46,10 +48,10 @@ namespace DapperTest
                         // commit movement
                         ConsumerProducerPathNode pathNode = customerProducerPathBuffer[newPathIndex];
                         float3 tilePosition = settings.ConvertToWorldPosition(pathNode.gridPosition);
-                        Translation translation = new Translation() { Value = tilePosition };
-                        commandBuffer.SetComponent(vehicleEntity, translation);
 
                         vehicleMovement.pathIndex = newPathIndex;
+                        vehicleMovement.currentPosition = tilePosition;
+                        vehicleMovement.nextPosition = GetNextPosition(newPathIndex, targetBuildingType, customerProducerPathBuffer, settings);
                     }
                     else
                     {
@@ -94,10 +96,10 @@ namespace DapperTest
                         DynamicBuffer<ConsumerProducerPathNode> customerProducerPathBuffer = consumerProducerPathBufferFromEntity[consumerEntity];
                         ConsumerProducerPathNode pathNode = customerProducerPathBuffer[newPathIndex];
                         float3 tilePosition = settings.ConvertToWorldPosition(pathNode.gridPosition);
-                        Translation translation = new Translation() { Value = tilePosition };
-                        commandBuffer.SetComponent(vehicleEntity, translation);
 
                         vehicleMovement.pathIndex = newPathIndex;
+                        vehicleMovement.currentPosition = tilePosition;
+                        vehicleMovement.nextPosition = GetNextPosition(newPathIndex, targetBuildingType, customerProducerPathBuffer, settings);
                     }
                     else
                     {
@@ -117,6 +119,31 @@ namespace DapperTest
             }).Schedule();
             
             beginSimulationSystem.AddJobHandleForProducer(Dependency);
+        }
+
+        private static float3 GetNextPosition(int pathIndex, BuildingType targetBuildingType,
+            DynamicBuffer<ConsumerProducerPathNode> customerProducerPathBuffer, GameSettings settings)
+        {
+            int nextPathIndex = 0;
+            
+            if (targetBuildingType == BuildingType.Producer)
+            {
+                int maxPathIndex = customerProducerPathBuffer.Length - 1;
+                nextPathIndex = pathIndex + 1;
+
+                if (nextPathIndex > maxPathIndex) 
+                    nextPathIndex = maxPathIndex;
+            }
+            else
+            {
+                nextPathIndex = pathIndex - 1;
+
+                if (nextPathIndex < 0)
+                    nextPathIndex = 0;
+            }
+
+            int2 gridPosition = customerProducerPathBuffer[nextPathIndex].gridPosition;
+            return settings.ConvertToWorldPosition(gridPosition);
         }
     }
 }

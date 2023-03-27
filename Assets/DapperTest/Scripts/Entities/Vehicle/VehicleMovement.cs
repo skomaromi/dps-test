@@ -1,4 +1,5 @@
 using Unity.Entities;
+using Unity.Mathematics;
 
 namespace DapperTest
 {
@@ -9,5 +10,8 @@ namespace DapperTest
         public BuildingType targetBuildingType;
         public double timeLastMoved;
         public int pathIndex;
+        
+        public float3 currentPosition;
+        public float3 nextPosition;
     }
 }
