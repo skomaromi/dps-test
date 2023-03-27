@@ -32,7 +32,7 @@ namespace DapperTest
                 
                 // increment total available products
                 productCountData.availableProductCount++;
-                ProductCountLabelUtility.MarkLabelNeedsUpdate(commandBuffer, producerEntity, entityInQueryIndex);
+                BuildingLabelUtility.MarkLabelNeedsUpdate(commandBuffer, producerEntity, entityInQueryIndex);
 
                 // allocate product to next consumer
                 int consumerCount = consumerSlotBuffer.Length;

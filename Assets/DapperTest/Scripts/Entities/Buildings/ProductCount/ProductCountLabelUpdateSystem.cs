@@ -17,7 +17,7 @@ namespace DapperTest
 
             Entities
                 .WithAny<ProductCountLabelNeedsUpdateTag>()
-                .ForEach((Entity entity, ProductCountLabelHolder holder, in ProductCountData productCountData) =>
+                .ForEach((Entity entity, BuildingLabelHolder holder, in ProductCountData productCountData) =>
             {
                 holder.label.SetAvailableProductsCount(productCountData.availableProductCount); 
                 commandBuffer.RemoveComponent<ProductCountLabelNeedsUpdateTag>(entity);

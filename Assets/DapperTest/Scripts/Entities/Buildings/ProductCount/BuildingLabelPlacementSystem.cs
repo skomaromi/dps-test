@@ -3,7 +3,7 @@ using Unity.Transforms;
 
 namespace DapperTest
 {
-    public partial class ProductCountLabelPlacementSystem : SystemBase
+    public partial class BuildingLabelPlacementSystem : SystemBase
     {
         private BeginSimulationEntityCommandBufferSystem beginSimulationSystem;
 
@@ -18,9 +18,16 @@ namespace DapperTest
             
             Entities
                 .WithAny<NeedsProductCountLabelTag>()
-                .ForEach((Entity entity, ProductCountLabelHolder holder, in Translation translation) =>
+                .ForEach((Entity entity, BuildingLabelHolder holder, in Translation translation) =>
             {
-                holder.label = ProductCountLabelManager.Instance.InstantiateLabel(translation.Value);
+                holder.label = BuildingLabelManager.Instance.InstantiateLabel(translation.Value);
+
+                BuildingType buildingType = EntityManager.HasComponent<Producer>(entity) ? 
+                    BuildingType.Producer : 
+                    BuildingType.Consumer;
+                
+                holder.label.SetBuildingType(buildingType);
+                
                 commandBuffer.RemoveComponent<NeedsProductCountLabelTag>(entity);
             }).WithoutBurst().Run();
         }

@@ -61,7 +61,7 @@ namespace DapperTest
                         ProductCountData producerProductCountData = productCountDataFromEntity[producerEntity];
                         producerProductCountData.availableProductCount--;
                         productCountDataFromEntity[producerEntity] = producerProductCountData;
-                        ProductCountLabelUtility.MarkLabelNeedsUpdate(commandBuffer, producerEntity);
+                        BuildingLabelUtility.MarkLabelNeedsUpdate(commandBuffer, producerEntity);
                         
                         // ... from own slot
                         DynamicBuffer<ConsumerSlot> consumerSlotBuffer = consumerSlotBufferFromEntity[producerEntity];
@@ -106,7 +106,7 @@ namespace DapperTest
                         ProductCountData consumerProductCountData = productCountDataFromEntity[consumerEntity];
                         consumerProductCountData.availableProductCount++;
                         commandBuffer.SetComponent(consumerEntity, consumerProductCountData);
-                        ProductCountLabelUtility.MarkLabelNeedsUpdate(commandBuffer, consumerEntity);
+                        BuildingLabelUtility.MarkLabelNeedsUpdate(commandBuffer, consumerEntity);
                         
                         // destroy self
                         commandBuffer.DestroyEntity(vehicleEntity);

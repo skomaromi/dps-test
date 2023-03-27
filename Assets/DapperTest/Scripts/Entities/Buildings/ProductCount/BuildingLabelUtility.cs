@@ -2,7 +2,7 @@ using Unity.Entities;
 
 namespace DapperTest
 {
-    public static class ProductCountLabelUtility
+    public static class BuildingLabelUtility
     {
         public static void MarkLabelNeedsUpdate(EntityCommandBuffer commandBuffer, Entity entity)
         {
